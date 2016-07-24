@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<bean id="dataSource1" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${db.jdbc.driverClassName}" />
+		<property name="url" value="${db1.jdbc.url}" />
+		<property name="username" value="${db1.jdbc.username}" />
+		<property name="password" value="${db1.jdbc.password}" />
+		<property name="maxActive" value="20" />
+		<property name="maxIdle" value="3" />
+		<property name="maxWait" value="15000" />
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />
+		<property name="minEvictableIdleTimeMillis" value="180000" />
+	</bean>
+
+
+	<bean id="dataSource2" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${db.jdbc.driverClassName}" />
+		<property name="url" value="${db2.jdbc.url}" />
+		<property name="username" value="${db2.jdbc.username}" />
+		<property name="password" value="${db2.jdbc.password}" />
+		<property name="maxActive" value="20" />
+		<property name="maxIdle" value="3" />
+		<property name="maxWait" value="15000" />
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />
+		<property name="minEvictableIdleTimeMillis" value="180000" />
+	</bean>
+
+	<!-- 数据源 -->
+	<bean id="mysqlDynamicDataSource" class="com.test.dynamicDataSource.common.DynamicDataSource">
+		<!--目标数据源-->
+        <property name="targetDataSources">
+			<map>
+				<entry key="db1" value-ref="dataSource1" />
+				<entry key="db2" value-ref="dataSource2" />
+			</map>
+		</property>
+	</bean>
+
+	<!-- 路由 -->
+	<bean id="dBRouter" class="com.test.dynamicDataSource.common.router.impl.RouteServiceImpl">
+		<property name="routeRuleSet" ref="routeRuleSet"></property>
+	</bean>
+
+	<bean id="routeRuleSet" class="com.test.dynamicDataSource.common.router.RouteRule.RouteRuleSet">
+		<property name="dbNumber" value="2"></property>
+		<property name="tableNumber" value="2"></property>
+		<property name="dbKeyArray">
+			<list>
+				<value>db1</value>
+				<value>db2</value>
+			</list>
+		</property>
+	</bean>
+
+</beans>
